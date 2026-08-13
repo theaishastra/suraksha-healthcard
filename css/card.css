@@ -1,0 +1,147 @@
+/* Removed external Google Fonts import to avoid CORS/taint issues when
+   generating the PDF. Use default system fonts instead. */
+
+:root {
+  /* Sampled from img/front.png and img/back.png */
+  --cf-navy: #2a2b5c;
+  --cf-navy-text: #173b61;
+  --cf-cream: #eeded2;
+  --cf-orange: #dba178;
+  --cf-green: #508a39;
+  --cf-white: #ffffff;
+  --cf-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
+}
+
+/* The card wrapper uses system sans-serif fonts to ensure canvas rendering
+   doesn't pull in cross‑origin font files. */
+.cf-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Card size matches the 1050×600 template artwork's aspect ratio. */
+.cf-card {
+  width: 900px;
+  height: 514px;
+  position: relative;
+  overflow: hidden;
+  background: var(--cf-white);
+  box-shadow: var(--cf-shadow);
+  border-radius: 4px;
+}
+
+.cf-template-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* =========================
+   FRONT — Card ID / District / Mobile row + family members table
+   Positioned over the blank content area of img/front.png (between the
+   navy header band and the cream footer band), scaled from the
+   1050×600 source artwork to the 900×514 card. Matches the layout in
+   samples/family-front-sample.png.
+   ========================= */
+.cf-info-row {
+  position: absolute;
+  top: 226px;
+  left: 130px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.cf-info-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cf-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--cf-orange);
+  text-transform: uppercase;
+}
+
+.cf-info-value {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--cf-navy-text);
+  white-space: nowrap;
+}
+
+.cf-members-table {
+  position: absolute;
+  top: 262px;
+  left: 130px;
+  right: 190px;
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.cf-table-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 20px;
+  background: var(--cf-white);
+}
+
+.cf-table-header {
+  background: var(--cf-navy);
+}
+
+.cf-row-alt {
+  background: var(--cf-cream);
+}
+
+.cf-table-row .cf-col-name,
+.cf-table-row .cf-col-age,
+.cf-table-row .cf-col-blood {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cf-navy-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Must come after the generic .cf-table-row text rule above so the
+   orange header color wins despite equal (two-class) specificity. */
+.cf-table-header .cf-col-name,
+.cf-table-header .cf-col-age,
+.cf-table-header .cf-col-blood {
+  color: var(--cf-orange);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.cf-col-name  { flex: 2; }
+.cf-col-age   { flex: 1; text-align: center; }
+.cf-col-blood { flex: 1.4; text-align: center; }
+
+/* =========================
+   PRINT / PDF
+   ========================= */
+@media print {
+  .cf-card-wrapper {
+    gap: 12px;
+  }
+
+  .cf-card {
+    box-shadow: none;
+    border-radius: 0;
+  }
+}

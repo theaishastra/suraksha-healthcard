@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sree Suraksha Hospital – Family Health Card Registration</title>
+  <!-- Removed Google Fonts to prevent CORS issues when rendering the card to a canvas.
+       System fonts will be used instead. -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/card.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-area">
+        <img src="img/sree_suraksha_logo.png" alt="Sree Suraksha Hospital Logo" class="logo-img">
+      </div>
+      <a href="pages/verify.html" class="verify-link">Verify Card</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Family Health Card Registration</div>
+      <h1>Register for Your <span class="highlight">Sree Suraksha Family Health Card</span></h1>
+      <p>Get the exclusive Sree Suraksha Family Health Card and unlock benefits for you and your family — 20% discount on OP Consultation, 20% discount on OP Investigations, 10% discount on IP Cash Tariff, one-step room upgradation on IP admission, 10% discount on Health Check-Up packages, and free ambulance service within 10 km of Sree Suraksha Hospital. Register once, generate your card, and show it at the hospital to use your benefits.</p>
+      <div class="hero-partners">
+        <h3>Our Departments</h3>
+        <ul class="partner-list">
+          <li>General Medicine</li>
+          <li>Orthopedics</li>
+          <li>Urology</li>
+          <li>General Surgery</li>
+          <li>Gynaecology</li>
+          <li>Nephrology</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <main class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <h2>Registration Form</h2>
+        <p>All fields marked with <span class="req">*</span> are required</p>
+      </div>
+
+      <form id="registrationForm" novalidate>
+
+        <div class="form-section">
+          <div class="section-title"><span class="section-num">1</span> Personal Information</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullName">Full Name <span class="req">*</span></label>
+              <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" />
+              <span class="error-msg" id="err-fullName"></span>
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender <span class="req">*</span></label>
+              <select id="gender" name="gender">
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-msg" id="err-gender"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">Age <span class="req">*</span></label>
+              <input type="number" id="age" name="age" placeholder="Your age" min="1" max="120" />
+              <span class="error-msg" id="err-age"></span>
+            </div>
+            <div class="form-group">
+              <label for="relation">Relation <span class="req">*</span></label>
+              <select id="relation" name="relation">
+                <option value="">Select relation</option>
+                <option value="Self">Self</option>
+                <option value="Wife">Wife</option>
+                <option value="Daughter">Daughter</option>
+                <option value="Mother">Mother</option>
+                <option value="Father">Father</option>
+                <option value="Sister">Sister</option>
+                <option value="Brother">Brother</option>
+                <option value="Son">Son</option>
+              </select>
+              <span class="error-msg" id="err-relation"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bloodGroup">Blood Group</label>
+              <select id="bloodGroup" name="bloodGroup">
+                <option value="">Select blood group (optional)</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title"><span class="section-num">2</span> Family Members <span class="section-optional">(Optional)</span></div>
+          <p class="family-members-intro">Covering more than yourself? Add other family members included on this card.</p>
+
+          <div id="familyMembersList" class="family-members-list"></div>
+
+          <button type="button" id="addMemberBtn" class="add-member-btn">
+            <span class="plus-icon">+</span> Add Family Member
+          </button>
+          <p id="memberLimitHint" class="member-limit-hint hidden">Maximum of 4 members per card reached (including yourself).</p>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title"><span class="section-num">3</span> Contact Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="mobile">Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="mobile" name="mobile" placeholder="10-digit mobile number" maxlength="10" />
+              <span class="error-msg" id="err-mobile"></span>
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address <span class="req">*</span></label>
+              <input type="email" id="email" name="email" placeholder="your@email.com" />
+              <span class="error-msg" id="err-email"></span>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="address">Address <span class="req">*</span></label>
+            <textarea id="address" name="address" rows="3" placeholder="House No, Street / Landmark"></textarea>
+            <span class="error-msg" id="err-address"></span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="village">Village / Town <span class="req">*</span></label>
+              <input type="text" id="village" name="village" placeholder="Village or town" />
+              <span class="error-msg" id="err-village"></span>
+            </div>
+            <div class="form-group">
+              <label for="mandal">Mandal <span class="req">*</span></label>
+              <input type="text" id="mandal" name="mandal" placeholder="Mandal" />
+              <span class="error-msg" id="err-mandal"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="district">District <span class="req">*</span></label>
+              <input type="text" id="district" name="district" placeholder="District" />
+              <span class="error-msg" id="err-district"></span>
+            </div>
+            <div class="form-group">
+              <label for="state">State <span class="req">*</span></label>
+              <input type="text" id="state" name="state" placeholder="State" value="Telangana" />
+              <span class="error-msg" id="err-state"></span>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="anyQuery">Any Query / Message</label>
+            <textarea id="anyQuery" name="anyQuery" rows="2" placeholder="Any questions or special requests?"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title"><span class="section-num">4</span> Photo Documents</div>
+          <div class="form-row upload-row">
+            <div class="form-group upload-group">
+              <label>Aadhaar Photo (optional)</label>
+              <div class="upload-box" id="aadharUploadBox">
+                <input type="file" id="aadharPhoto" name="aadharPhoto" accept="image/*" class="file-input" />
+                <div class="upload-placeholder" id="aadharPlaceholder">
+                  <div class="upload-icon">🪪</div>
+                  <div class="upload-text">Click or tap to upload Aadhaar (optional)</div>
+                  <div class="upload-hint">JPG, PNG – max 5MB</div>
+                </div>
+                <img id="aadharPreview" class="upload-preview" alt="Aadhaar preview" />
+              </div>
+              <span class="error-msg" id="err-aadhar"></span>
+            </div>
+            <div class="form-group upload-group">
+              <label>Passport Photo <span class="req">*</span></label>
+              <div class="upload-box" id="selfieUploadBox">
+                <input type="file" id="selfiePhoto" name="selfiePhoto" accept="image/*" class="file-input" />
+                <div class="upload-placeholder" id="selfiePlaceholder">
+                  <div class="upload-icon">🤳</div>
+                  <div class="upload-text">Click or tap to upload Passport</div>
+                  <div class="upload-hint">JPG, PNG – max 5MB</div>
+                </div>
+                <img id="selfiePreview" class="upload-preview" alt="Passport preview" />
+              </div>
+              <span class="error-msg" id="err-selfie"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section consent-section">
+          <label class="checkbox-label">
+            <input type="checkbox" id="consent" name="consent" />
+            <span class="checkmark"></span>
+            <span>I confirm that all the information provided is accurate and I agree to the terms of the Sree Suraksha Family Health Card program. <span class="req">*</span></span>
+          </label>
+          <span class="error-msg" id="err-consent"></span>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" id="submitBtn" class="submit-btn">
+            <span id="btnText">Register &amp; Get My Health Card</span>
+            <span id="btnLoader" class="btn-loader hidden">
+              <span class="spinner"></span> <span id="progressMsg">Processing…</span>
+            </span>
+          </button>
+        </div>
+
+      </form>
+
+      <div id="globalError" class="global-error hidden"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Card valid at <strong>Sree Suraksha Hospital</strong> &nbsp;|&nbsp; <strong>7731083108</strong> &nbsp;|&nbsp; <strong>9030808066</strong> &nbsp;|&nbsp; <strong>7729884000</strong></p>
+    <p class="tagline">"Caring For Your Health"</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/validate.js"></script>
+  <script src="js/family-members.js"></script>
+  <script src="js/compress-image.js"></script>
+  <script src="js/upload-files.js"></script>
+  <script src="js/card-builder.js"></script>
+  <script src="js/pdf-generator.js"></script>
+  <script src="js/submit.js"></script>
+</body>
+</html>
